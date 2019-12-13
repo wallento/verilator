@@ -89,6 +89,8 @@ struct V3ParseBisonYYSType {
         AstSenTree*     sentreep;
         AstVar*         varp;
         AstVarRef*      varrefp;
+
+        AstAttrType::en attrtype;
     };
 };
 

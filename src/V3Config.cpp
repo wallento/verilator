@@ -145,6 +145,36 @@ public:
 
 V3ConfigIgnores V3ConfigIgnores::s_singleton;
 
+class V3ConfigPublic {
+    typedef std::pair<AstAttrType, AstAlwaysPublic*> VarPublicEntry;
+    std::map<string,std::map<string,VarPublicEntry> > m_varPublics;
+    static V3ConfigPublic s_singleton;  // Singleton (not via local static, as that's slow)
+    V3ConfigPublic() {}
+    ~V3ConfigPublic() {}
+public:
+    inline static V3ConfigPublic& singleton() { return s_singleton; }
+    void addPublicVariable(const string& module, const string& signal, AstAttrType attrtype,
+                           AstAlwaysPublic* alwayspublicp) {
+        m_varPublics[module][signal] = make_pair(attrtype, alwayspublicp);
+    }
+    void applyPublicVariable(AstVar* varp, AstNodeModule* modp) {
+        if ((m_varPublics.find(modp->name()) != m_varPublics.end())
+            && (m_varPublics[modp->name()].find(varp->name()) != m_varPublics[modp->name()].end())) {
+            if (varp->attrsp()) {
+                cout << "Already have an attribute" << endl;
+            } else {
+                varp->addAttrsp(new AstAttrOf(varp->fileline(),
+                                m_varPublics[modp->name()][varp->name()].first));
+                if (m_varPublics[modp->name()][varp->name()].second) {
+                    varp->addNext(m_varPublics[modp->name()][varp->name()].second);
+                }
+            }
+        }
+    }
+};
+
+V3ConfigPublic V3ConfigPublic::s_singleton;
+
 //######################################################################
 // V3Config
 
@@ -160,3 +190,13 @@ void V3Config::addIgnore(V3ErrorCode code, bool on, const string& filename, int 
 void V3Config::applyIgnores(FileLine* filelinep) {
     V3ConfigIgnores::singleton().applyIgnores(filelinep);
 }
+
+void V3Config::addPublicVariable(const string& module, const string& variable, AstAttrType prop,
+                                 AstAlwaysPublic* alwayspublicp) {
+    V3ConfigPublic::singleton().addPublicVariable(module, variable, prop, alwayspublicp);
+}
+
+void V3Config::applyPublic(AstVar* nodep, AstNodeModule* modp) {
+    V3ConfigPublic::singleton().applyPublicVariable(nodep, modp);
+}
+

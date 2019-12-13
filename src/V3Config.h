@@ -26,6 +26,7 @@
 
 #include "V3Error.h"
 #include "V3FileLine.h"
+#include "V3Ast.h"
 
 //######################################################################
 
@@ -33,6 +34,9 @@ class V3Config {
 public:
     static void addIgnore(V3ErrorCode code, bool on, const string& filename, int min, int max);
     static void applyIgnores(FileLine* filelinep);
+    static void addPublicVariable(const string& module, const string& varstr, AstAttrType attr,
+                                  AstAlwaysPublic* alwayspublicp = NULL);
+    static void applyPublic(AstVar* nodep, AstNodeModule* modp);
 };
 
 #endif  // Guard

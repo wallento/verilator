@@ -141,10 +141,16 @@ vnum    {vnum1}|{vnum2}|{vnum3}|{vnum4}|{vnum5}
   "lint_on"             { FL; return yVLT_LINT_ON; }
   "tracing_off"         { FL; return yVLT_TRACING_OFF; }
   "tracing_on"          { FL; return yVLT_TRACING_ON; }
+  "public"              { FL; return yVLT_PUBLIC; }
+  "public_flat"         { FL; return yVLT_PUBLIC_FLAT; }
+  "public_flat_rd"      { FL; return yVLT_PUBLIC_FLAT_RD; }
+  "public_flat_rw"      { FL; return yVLT_PUBLIC_FLAT_RW; }
+  "public_module"       { FL; return yVLT_PUBLIC_MODULE; }
 
   -?"-file"             { FL; return yVLT_D_FILE; }
   -?"-lines"            { FL; return yVLT_D_LINES; }
   -?"-msg"              { FL; return yVLT_D_MSG; }
+  -?"-module"           { FL; return yVLT_D_MODULE; }
 }
 
   /************************************************************************/

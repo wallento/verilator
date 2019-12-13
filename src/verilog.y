@@ -273,16 +273,22 @@ class AstSenTree;
 %token<strp>		yaSCCTOR	"`systemc_implementation BLOCK"
 %token<strp>		yaSCDTOR	"`systemc_imp_header BLOCK"
 
-%token<fl>		yVLT_COVERAGE_OFF "coverage_off"
-%token<fl>		yVLT_COVERAGE_ON  "coverage_on"
-%token<fl>		yVLT_LINT_OFF	  "lint_off"
-%token<fl>		yVLT_LINT_ON	  "lint_on"
-%token<fl>		yVLT_TRACING_OFF  "tracing_off"
-%token<fl>		yVLT_TRACING_ON   "tracing_on"
+%token<fl>		yVLT_COVERAGE_OFF   "coverage_off"
+%token<fl>		yVLT_COVERAGE_ON    "coverage_on"
+%token<fl>		yVLT_LINT_OFF	    "lint_off"
+%token<fl>		yVLT_LINT_ON	    "lint_on"
+%token<fl>		yVLT_TRACING_OFF    "tracing_off"
+%token<fl>		yVLT_TRACING_ON     "tracing_on"
+%token<fl>		yVLT_PUBLIC		    "public"
+%token<fl>		yVLT_PUBLIC_FLAT    "public_flat"
+%token<fl>		yVLT_PUBLIC_FLAT_RD "public_flat_rd"
+%token<fl>		yVLT_PUBLIC_FLAT_RW "public_flat_rw"
+%token<fl>		yVLT_PUBLIC_MODULE  "public_module"
 
 %token<fl>		yVLT_D_FILE	"--file"
 %token<fl>		yVLT_D_LINES	"--lines"
 %token<fl>		yVLT_D_MSG	"--msg"
+%token<fl>		yVLT_D_MODULE "--module"
 
 %token<strp>		yaD_IGNORE	"${ignored-bbox-sys}"
 %token<strp>		yaD_DPI		"${dpi-sys}"
@@ -4085,6 +4091,9 @@ vltItem:
 	|	vltOnFront yVLT_D_FILE yaSTRING		{ V3Config::addIgnore($1,true,*$3,0,0); }
 	|	vltOnFront yVLT_D_FILE yaSTRING yVLT_D_LINES yaINTNUM			{ V3Config::addIgnore($1,true,*$3,$5->toUInt(),$5->toUInt()+1); }
 	|	vltOnFront yVLT_D_FILE yaSTRING yVLT_D_LINES yaINTNUM '-' yaINTNUM	{ V3Config::addIgnore($1,true,*$3,$5->toUInt(),$7->toUInt()+1); }
+	|   vltPublicFront yaSTRING yaSTRING { V3Config::addPublicVariable(*$2,*$3,$1,NULL); v3Global.dpi(true); }
+	|   yVLT_PUBLIC_FLAT_RW yaSTRING yaSTRING { V3Config::addPublicVariable(*$2,*$3,AstAttrType::VAR_PUBLIC_FLAT_RW,NULL); v3Global.dpi(true); }
+	|   yVLT_PUBLIC_FLAT_RW yaSTRING yaSTRING attr_event_control { V3Config::addPublicVariable(*$2,*$3,AstAttrType::VAR_PUBLIC_FLAT_RW,new AstAlwaysPublic($1,$4,NULL)); v3Global.dpi(true); }
 	;
 
 vltOffFront<errcodeen>:
@@ -4103,6 +4112,12 @@ vltOnFront<errcodeen>:
 	|	yVLT_LINT_ON yVLT_D_MSG yaID__ETC
 			{ $$ = V3ErrorCode((*$3).c_str());
 			  if ($$ == V3ErrorCode::EC_ERROR) { $1->v3error("Unknown Error Code: "<<*$3<<endl);  } }
+	;
+
+vltPublicFront<attrtype>:
+	    yVLT_PUBLIC         { $$ = AstAttrType::VAR_PUBLIC; }
+	|   yVLT_PUBLIC_FLAT    { $$ = AstAttrType::VAR_PUBLIC_FLAT; }
+	|   yVLT_PUBLIC_FLAT_RD { $$ = AstAttrType::VAR_PUBLIC_FLAT_RD; }
 	;
 
 //**********************************************************************

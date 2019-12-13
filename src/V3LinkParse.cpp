@@ -28,6 +28,7 @@
 #include "V3Global.h"
 #include "V3LinkParse.h"
 #include "V3Ast.h"
+#include "V3Config.h"
 
 #include <algorithm>
 #include <cstdarg>
@@ -188,6 +189,9 @@ private:
             }
             return;
         }
+
+        // Maybe this variable is made public by a vlt config file
+        V3Config::applyPublic(nodep, m_modp);
 
         if (v3Global.opt.publicFlatRW()) {
             switch (nodep->varType()) {
