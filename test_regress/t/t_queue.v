@@ -37,6 +37,7 @@ module t (/*AUTOARG*/
          // Strings
          string q[$];
          string v;
+         int j = 0;
 
          q.push_front("f1");
          q.push_back("b1");
@@ -59,6 +60,16 @@ module t (/*AUTOARG*/
          //Unsup: q.insert(3, "ins3");
          //v = q[0]; `checks(v, "ins0");
          //v = q[3]; `checks(v, "ins3");
+
+         foreach (q[i]) begin
+            j++;
+            v = q[i];
+            if (i == 0) `checks(v, "f2");
+            if (i == 1) `checks(v, "f1");
+            if (i == 2) `checks(v, "b1");
+            if (i == 3) `checks(v, "b2");
+         end
+         `checkh(j,4);
 
          q.pop_front();
          v = q.pop_front(); `checks(v, "f1");
