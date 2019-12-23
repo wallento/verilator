@@ -1,0 +1,10 @@
+%Error: t/t_vlt_syntax_bad.vlt:8: public_flat_rw needs sensitivity
+public_flat_rw -module "t" -var "x"
+^~~~~~~~~~~~~~
+%Error: t/t_vlt_syntax_bad.vlt:9: sensitivity not expected for attribute
+public -module "t" @(posedge clk)
+                   ^
+%Error: t/t_vlt_syntax_bad.vlt:10: isolate_assignments only applies to signals or functions/tasks
+isolate_assignments -module "t"
+^~~~~~~~~~~~~~~~~~~
+%Error: Exiting due to

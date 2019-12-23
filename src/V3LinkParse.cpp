@@ -28,6 +28,7 @@
 #include "V3Global.h"
 #include "V3LinkParse.h"
 #include "V3Ast.h"
+#include "V3Config.h"
 
 #include <algorithm>
 #include <cstdarg>
@@ -62,6 +63,7 @@ private:
     AstNodeModule*      m_modp;         // Current module
     AstNodeFTask*       m_ftaskp;       // Current task
     AstNodeDType*       m_dtypep;       // Current data type
+    AstFunc*            m_funcp;        // Current function
 
     // METHODS
     VL_DEBUG_FUNC;  // Declare debug()
@@ -106,6 +108,8 @@ private:
 
     // VISITs
     virtual void visit(AstNodeFTask* nodep) {
+        V3Config::applyFTask(m_modp, nodep);
+
         if (!nodep->user1SetOnce()) {  // Process only once.
             cleanFileline(nodep);
             m_ftaskp = nodep;
@@ -188,6 +192,9 @@ private:
             }
             return;
         }
+
+        // Maybe this variable has a signal attribute
+        V3Config::applyVarAttr(m_modp, (m_funcp ? m_funcp : m_ftaskp), nodep);
 
         if (v3Global.opt.publicFlatRW()) {
             switch (nodep->varType()) {
@@ -438,6 +445,8 @@ private:
     }
 
     virtual void visit(AstNodeModule* nodep) {
+        V3Config::applyModule(nodep);
+
         // Module: Create sim table for entire module and iterate
         cleanFileline(nodep);
         //
@@ -474,6 +483,17 @@ private:
         visitIterateNoValueMod(nodep);
     }
 
+    virtual void visit(AstBegin* nodep) {
+        V3Config::applyCoverageBlock(m_modp, nodep);
+        cleanFileline(nodep);
+        iterateChildren(nodep);
+    }
+    virtual void visit(AstCase* nodep) {
+        V3Config::applyCase(nodep);
+        cleanFileline(nodep);
+        iterateChildren(nodep);
+    }
+
     virtual void visit(AstNode* nodep) {
         // Default: Just iterate
         cleanFileline(nodep);
@@ -486,6 +506,7 @@ public:
         m_varp = NULL;
         m_modp = NULL;
         m_ftaskp = NULL;
+        m_funcp = NULL;
         m_dtypep = NULL;
         m_inAlways = false;
         m_inGenerate = false;
