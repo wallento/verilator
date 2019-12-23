@@ -74,6 +74,11 @@ bool VString::wildmatch(const char* s, const char* p) {
     return (*s == '\0');
 }
 
+bool VString::wildmatch(const string& s, const string& p) {
+    return wildmatch(s.c_str(), p.c_str());
+}
+
+
 string VString::dot(const string& a, const string& dot, const string& b) {
     if (b=="") return a;
     if (a=="") return b;
