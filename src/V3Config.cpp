@@ -333,8 +333,11 @@ typedef std::bitset<V3LineOccurenceType::ENUM_SIZE> V3LineOccurence;
 
 class ConfigFile {
     typedef std::map<int, V3LineOccurence> LineMap;
+    typedef std::pair<V3ErrorCode, string> WaiverSetting;
+    typedef std::vector<WaiverSetting> Waivers;
 
     LineMap m_lines;
+    Waivers m_waivers;
 
     bool lineMatch(int lineno, V3LineOccurenceType type) {
         if (m_lines.find(0) != m_lines.end() && m_lines[0][type]) return true;
@@ -347,9 +350,14 @@ public:
              it != file.m_lines.end(); ++it) {
             m_lines[it->first] |= it->second;
         }
+        m_waivers.reserve(m_waivers.size() + file.m_waivers.size());
+        m_waivers.insert(m_waivers.end(), file.m_waivers.begin(), file.m_waivers.end());
     }
     void addLineOccurence(int lineno, V3LineOccurenceType attr) {
         m_lines[lineno].set(attr);
+    }
+    void addWaiver(V3ErrorCode code, const string& match) {
+        m_waivers.push_back(make_pair(code, match));
     }
 
     void applyBlock(AstBegin* nodep) {
@@ -362,6 +370,13 @@ public:
         int lineno = nodep->fileline()->lineno();
         if (lineMatch(lineno, FULL_CASE)) nodep->fullPragma(true);
         if (lineMatch(lineno, PARALLEL_CASE)) nodep->parallelPragma(true);
+    }
+    bool waive(V3ErrorCode code, const string& match) {
+        for (Waivers::const_iterator it = m_waivers.begin(); it != m_waivers.end(); ++it) {
+            if (((it->first == code) || (it->first == V3ErrorCode::I_LINT))
+                && VString::wildmatch(match, it->second)) return true;
+        }
+        return false;
     }
 };
 
@@ -461,6 +476,10 @@ void V3Config::addVarAttr(FileLine* fl, const string& module, const string& ftas
     }
 }
 
+void V3Config::addWaiver(V3ErrorCode code, const string& filename, const string& match) {
+    V3ConfigAttributes::singleton().files().at(filename).addWaiver(code, match);
+}
+
 void V3Config::applyCase(AstCase* nodep) {
     const string& filename = nodep->fileline()->filename();
     ConfigFile* file = V3ConfigAttributes::singleton().files().resolve(filename);
@@ -507,4 +526,10 @@ void V3Config::applyVarAttr(AstNodeModule* modulep, AstNodeFTask* ftaskp,
         vp = modp->vars().resolve(varp->name());
     }
     if (vp) vp->apply(varp);
+}
+
+bool V3Config::waive(FileLine* filelinep, V3ErrorCode code, const string& message) {
+    ConfigFile* file = V3ConfigAttributes::singleton().files().resolve(filelinep->filename());
+    if (!file) return false;
+    return file->waive(code, message);
 }
