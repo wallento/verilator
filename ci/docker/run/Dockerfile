@@ -22,7 +22,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ARG REPO=https://github.com/verilator/verilator
+ARG REPO=https://github.com/wallento/verilator
 ARG SOURCE_COMMIT=master
 
 WORKDIR /tmp
