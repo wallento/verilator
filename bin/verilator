@@ -311,6 +311,7 @@ detailed descriptions in L</"VERILATION ARGUMENTS"> for more information.
     --gdb                       Run Verilator under GDB interactively
     --gdbbt                     Run Verilator under GDB for backtrace
     --generate-key              Create random key for --protect-key
+    --generate-waivefile <filename>  Create a waiver file based on the linter warnings
     --getenv <var>              Get environment variable with defaults
     --help                      Display this help
      -I<dir>                    Directory to search for includes
@@ -909,6 +910,16 @@ If --debug is specified, run Verilator underneath a GDB process and print a
 backtrace on exit, then exit GDB immediately.  Without --debug or if GDB
 doesn't seem to work, this flag is ignored.  Intended for easy creation of
 backtraces by users; otherwise see the --gdb flag.
+
+=item --generate-waivefile <filename>
+
+Generate a waiver file which contains all waiver statements to suppress the
+warnings emitted during this Verilator run. This is in particular useful as
+a starting point for solving linter warnings or suppressing them
+systematically.
+
+The generated file can directly be consumed by Verilator. The usual file
+extension is .vlt.
 
 =item --generate-key
 

@@ -308,6 +308,7 @@ private:
     string      m_bin;          // main switch: --bin {binary}
     string      m_exeName;      // main switch: -o {name}
     string      m_flags;        // main switch: -f {name}
+    string      m_generateWaivefile;  // main switch: --generate-waivefile {name}
     string      m_l2Name;       // main switch: --l2name; "" for top-module's name
     string      m_makeDir;      // main switch: -Mdir
     string      m_modPrefix;    // main switch: --mod-prefix
@@ -503,6 +504,8 @@ public:
     int compLimitParens() const { return m_compLimitParens; }
 
     string exeName() const { return m_exeName != "" ? m_exeName : prefix(); }
+    string generateWaivefile() const { return m_generateWaivefile; }
+    bool trueGenerateWaivefile() const { return m_generateWaivefile.length() > 0; }
     string l2Name() const { return m_l2Name; }
     string makeDir() const { return m_makeDir; }
     string modPrefix() const { return m_modPrefix; }

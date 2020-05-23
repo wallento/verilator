@@ -1,0 +1,11 @@
+`verilator_config
+
+// TODO: Fix or keep to ignore?
+lint_off -rule DECLFILENAME -file "*t/t_waivefile.v" -match "Filename 't_waivefile' does not match MODULE name: 't'"
+
+// TODO: Fix or keep to ignore?
+lint_off -rule WIDTH -file "*t/t_waivefile.v" -match "Operator ASSIGN expects 1 bits on the Assign RHS, but Assign RHS's CONST '2'h3' generates 2 bits."
+
+// TODO: Fix or keep to ignore?
+lint_off -rule UNUSED -file "*t/t_waivefile.v" -match "Signal is not used: 'width_warn'"
+
